@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +15,18 @@ namespace FunWithExpressionTrees
         const string LogFileName = "C://temp//FactoryTestResults.txt";
 
         private IRepository _repo;
+
+        [OneTimeSetUp]
+        public void StartTest()
+        {
+            Trace.Listeners.Add(new ConsoleTraceListener());
+        }
+
+        [OneTimeTearDown]
+        public void EndTest()
+        {
+            Trace.Flush();
+        }
 
         [SetUp]
         public void Setup()
@@ -44,7 +57,9 @@ namespace FunWithExpressionTrees
 
             var consumerInstance = (Consumer)inst;
             var repoId = consumerInstance.GetRepoId();
-            File.AppendAllLines(LogFileName, new string[] { $"Reflection ({instanceCount}) ({inst.UniqueId}) ({repoId}) : {sw.ElapsedMilliseconds} milliseconds" });
+            string reportTxt = $"Reflection ({instanceCount}) ({inst.UniqueId}) ({repoId}) : {sw.ElapsedMilliseconds} milliseconds";
+            Console.WriteLine(reportTxt);
+            File.AppendAllLines(LogFileName, new string[] { reportTxt });
 
             Assert.NotNull(inst);
             Assert.IsInstanceOf<Consumer>(inst);
